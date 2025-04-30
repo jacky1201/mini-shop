@@ -1,0 +1,122 @@
+{
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+		}
+	},
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/my/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/my/register",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/product/index",
+			"style": {
+				"navigationBarTitleText": "商品列表"
+			}
+		},
+		{
+			"path": "pages/product/detail",
+			"style": {
+				"navigationBarTitleText": "商品详情"
+			}
+		},
+		{
+			"path": "pages/shopCart/index",
+			"style": {
+				"navigationBarTitleText": "购物车"
+			}
+		},
+		{
+			"path": "pages/club/index",
+			"style": {
+				"navigationBarTitleText": "俱乐部"
+			}
+		},
+		{
+			"path": "pages/order/confirm",
+			"style": {
+				"navigationBarTitleText": "订单确认"
+			}
+		},
+		{
+			"path": "pages/address/list",
+			"style": {
+				"navigationBarTitleText": "收货地址"
+			}
+		},
+		{
+			"path": "pages/address/detail",
+			"style": {
+				"navigationBarTitleText": "地址详情"
+			}
+		},
+		{
+			"path": "pages/coupon/index",
+			"style": {
+				"navigationBarTitleText": "优惠券"
+			}
+		}
+	],
+	"tabBar": {
+		"color": "#1A1A1A",
+		"selectedColor": "#333",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/tabs/home.png",
+				"selectedIconPath": "static/tabs/active/home.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/product/index",
+				"iconPath": "static/tabs/product.png",
+				"selectedIconPath": "static/tabs/active/product.png",
+				"text": "产品"
+			},
+			{
+				"pagePath": "pages/club/index",
+				"iconPath": "static/tabs/club.png",
+				"selectedIconPath": "static/tabs/club.png",
+				"text": "俱乐部"
+			},
+			{
+				"pagePath": "pages/shopCart/index",
+				"iconPath": "static/tabs/shop-cart.png",
+				"selectedIconPath": "static/tabs/active/shop-cart.png",
+				"text": "购物车"
+			},
+			{
+				"pagePath": "pages/my/index",
+				"iconPath": "static/tabs/my.png",
+				"selectedIconPath": "static/tabs/active/my.png",
+				"text": "我的"
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}
