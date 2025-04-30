@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"prettier.semi": false,
+		"prettier.singleQuote": true,
+		"prettier.trailingComma": "none",
+		"prettier.bracketSpacing": true,
+		"path-intellisense.mappings": {
+			"@": "${workspaceRoot}/src"
+		}
+	}
+}
