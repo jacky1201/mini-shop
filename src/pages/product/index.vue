@@ -1,19 +1,19 @@
 <script setup lang="ts">
   import { ref } from 'vue'
+  import navTabs  from '@/components/navTabs.vue'
 
   interface NavItem {
-    id: number
-    name: string
-    color: string // 每个导航项的独特颜色
+    key: string
+    label: string
   }
 
   // 导航数据
   const navItems = ref<NavItem[]>([
-    { id: 1, name: '全部', color: '#FF6B6B' },
-    { id: 2, name: '联名系列', color: '#4ECDC4' },
-    { id: 3, name: '艺术家精选', color: '#45B7D1' },
-    { id: 4, name: '明星同款', color: '#96CEB4' },
-    { id: 5, name: '玩转方案', color: '#FFAD60' },
+    { key: 'all', label: '全部' },
+    { key: 'all2', label: '联名系列'},
+    { key: 'all3', label: '艺术家精选' },
+    { key: 'all4', label: '明星同款' },
+    { key: 'all5', label: '玩转方案' },
   ])
 
   // 状态栏高度
@@ -46,7 +46,7 @@
 
   // 切换导航
   const switchNav = (id: number) => {
-    activeNavId.value = id
+    // activeNavId.value = id
   }
 
   // 跳转到搜索页面
@@ -89,22 +89,8 @@
     </view>
 
     <!-- 导航栏 -->
-    <scroll-view scroll-x class="nav-scroll" show-scrollbar="false" :scroll-into-view="`nav${activeNavId}`" scroll-with-animation>
-      <view class="nav-list">
-        <view
-          v-for="item in navItems"
-          :key="item.id"
-          :id="`nav${item.id}`"
-          class="nav-item"
-          :class="{ active: activeNavId === item.id }"
-          @tap="switchNav(item.id)"
-        >
-          {{ item.name }}
-          <!-- 选中底部色块 -->
-          <view v-if="activeNavId === item.id" class="active-indicator" :style="{ backgroundColor: item.color }"></view>
-        </view>
-      </view>
-    </scroll-view>
+    <nav-tabs :tabs="navItems"  @switchNav="switchNav" />
+    
 
     <!-- 商品列表 -->
     <view class="product-grid">
@@ -176,48 +162,6 @@
       .cart-icon {
         font-size: 40rpx;
         color: #333;
-      }
-    }
-  }
-
-  .nav-scroll {
-    background-color: #fff;
-    white-space: nowrap;
-    padding: 24rpx env(safe-area-inset-right) 0 env(safe-area-inset-left);
-    border-bottom: 1rpx solid #f0f0f0;
-
-    .nav-list {
-      display: flex;
-      padding: 0 20rpx;
-      position: relative;
-
-      .nav-item {
-        position: relative;
-        padding: 0 30rpx;
-        padding-bottom: 24rpx;
-        font-size: 28rpx;
-        color: #999;
-        transition: all 0.3s;
-
-        &.active {
-          color: #000;
-          font-weight: 500;
-
-          .active-indicator {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 48rpx;
-            height: 6rpx;
-            border-radius: 6rpx;
-            transition: all 0.3s;
-          }
-        }
-
-        &:active {
-          opacity: 0.7;
-        }
       }
     }
   }
