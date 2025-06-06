@@ -7,7 +7,7 @@
         :id="`nav${item.key}`"
         class="nav-item"
         :class="{ active: activeNavId === item.key }"
-        @tap="switchNav(item.key)"
+        @click="switchNav(item.key)"
       >
         {{ item.label }}
         <!-- 选中底部色块 -->
