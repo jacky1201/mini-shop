@@ -27,6 +27,10 @@
   const goBack = () => {
     uni.navigateBack({ delta: 1 })
   }
+
+  const bindAvatar = (e: any) => {
+    console.log('头像上传成功', e.detail.avatarUrl)
+  }
 </script>
 
 <template>
@@ -37,9 +41,9 @@
       <!-- 头像上传 -->
       <view class="avatar-upload">
         <image src="/static/images/casetify-logo.png" class="avatar" />
-        <view class="edit-icon">
+        <button class="edit-icon" open-type="chooseAvatar" @chooseavatar="bindAvatar">
           <staticImage src="/static/my/user-edit.png" width="36rpx" height="36rpx"></staticImage>
-        </view>
+        </button>
       </view>
 
       <!-- 表单区域 -->
@@ -141,6 +145,8 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+      padding-left: 0rpx;
+      padding-right: 0rpx;
     }
   }
 

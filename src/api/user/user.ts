@@ -3,7 +3,7 @@ import { useUserStore } from '@/store/user'
 
 const baseApi = '/estateVip'
 export default {
-	 userLogin() {
+  userLogin() {
     uni.login({
       success: async ({ code }) => {
         const { data } = await http.get<string>(`${baseApi}/open/getTokenByCode`, { code })
