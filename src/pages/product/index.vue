@@ -100,8 +100,7 @@
     </view>
 
     <!-- 导航栏 -->
-    <nav-tabs :tabs="navItems"  @switchNav="switchNav" />
-    
+    <nav-tabs :tabs="navItems":defaultActiveId="activeNavId"  @change="categoryChange" />
 
     <!-- 商品列表 -->
     <view class="product-grid">
