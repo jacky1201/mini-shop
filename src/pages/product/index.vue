@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  import navTabs  from '@/components/navTabs.vue'
+  import navTabs from '@/components/navTabs.vue'
 
   interface NavItem {
     key: string
@@ -10,7 +10,7 @@
   // 导航数据
   const navItems = ref<NavItem[]>([
     { key: 'all', label: '全部' },
-    { key: 'all2', label: '联名系列'},
+    { key: 'all2', label: '联名系列' },
     { key: 'all3', label: '艺术家精选' },
     { key: 'all4', label: '明星同款' },
     { key: 'all5', label: '玩转方案' },
@@ -89,8 +89,7 @@
     </view>
 
     <!-- 导航栏 -->
-    <nav-tabs :tabs="navItems"  @switchNav="switchNav" />
-    
+    <nav-tabs :tabs="navItems" @switchNav="switchNav" />
 
     <!-- 商品列表 -->
     <view class="product-grid">
