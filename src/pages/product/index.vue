@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import navTabs from '@/components/navTabs.vue'
-
+  import goodsAPI from '@/api/goods'
   interface NavItem {
     key: string
     label: string
@@ -9,45 +9,56 @@
 
   // 导航数据
   const navItems = ref<NavItem[]>([
-    { key: 'all', label: '全部' },
+    { key: 'all', label: '全部12' },
     { key: 'all2', label: '联名系列' },
     { key: 'all3', label: '艺术家精选' },
     { key: 'all4', label: '明星同款' },
     { key: 'all5', label: '玩转方案' },
   ])
 
+
+  onLoad(()=>{
+    getCategory()
+  })
+
+  const getCategory = ()=>{
+    goodsAPI.goodsCate({}).then(res=>{
+      console.log(res)
+      navItems.value = res.data.map((item:any)=>{ return { key: item.id, label: item.name} })
+      activeNavId.value = res.data[0].id
+      categoryChange(res.data[0].id)
+    })
+  }
+
+  const categoryChange = (id:string|number)=>{
+      goodsAPI.cateGoods({cate_id:id,limit:99,page:1}).then(res=>{
+        if(res.data.total > 0 ){
+          products.value = res.data.data.map((item:any)=>{ return { id: item.id, name: item.name, price: item.price, slider_image: JSON.parse(item.slider_image)[0] } })
+        }else{
+          products.value = []
+        }
+      })
+  }
   // 状态栏高度
   const statusBarHeight = ref(0)
 
   // 当前选中的导航项
-  const activeNavId = ref(1)
+  const activeNavId = ref()
 
   // 商品数据
   const products = ref([
     {
       id: 1,
-      name: '波漾手机壳 - 白色',
-      price: 419,
-      bgColor: '#f5f5f5',
-    },
-    {
-      id: 2,
-      name: '初雪',
-      price: 509,
-      bgColor: '#e8e8e8',
-    },
-    {
-      id: 3,
-      name: '星野梦境',
-      price: 509,
-      bgColor: '#f0f0f0',
+      name: '',
+      price: 0,
+      slider_image: '',
     },
   ])
 
   // 切换导航
-  const switchNav = (id: number) => {
-    // activeNavId.value = id
-  }
+  // const switchNav = (id: number) => {
+  //   activeNavId.value = id
+  // }
 
   // 跳转到搜索页面
   const goToSearch = () => {
@@ -89,12 +100,17 @@
     </view>
 
     <!-- 导航栏 -->
-    <nav-tabs :tabs="navItems" @switchNav="switchNav" />
+    <nav-tabs :tabs="navItems"  @switchNav="switchNav" />
+    
 
     <!-- 商品列表 -->
     <view class="product-grid">
-      <view class="product-card" v-for="product in products" :key="product.id" @tap="goToDetail(product.id)">
-        <view class="product-image-placeholder" :style="{ backgroundColor: product.bgColor }"></view>
+      <view class="product-card" v-for="product in products" :key="product.id" @click="goToDetail(product.id)">
+        <image
+        class="product-image-placeholder"
+          :src="product.slider_image"
+          mode="scaleToFill"
+        />
         <view class="product-info">
           <text class="product-name">{{ product.name }}</text>
           <text class="product-price">¥ {{ product.price }}</text>

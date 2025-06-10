@@ -2,7 +2,7 @@ import { useUserStore } from '../store/user'
 
 // const appGlobalData = getApp().globalData
 // const baseUrl = "https://meilin.cinlet.cn/"
-const baseUrl = 'https://chtest.woyeepay.com'
+const baseUrl = 'https://www.xianxiangshikong.cn/api'
 //  const baseUrl =  "http://10.34.209.100:19204";	// 顾问端生产环境
 // const baseUrl =  "http://10.34.203.133:19098/";	// 顾问端生产环境
 const tokenKey = 'accessToken'

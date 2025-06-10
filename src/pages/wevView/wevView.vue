@@ -1,5 +1,5 @@
 <template>
-  <web-view src="https://hl.hualtek.com/wap/50/pagesOthers/pay?order id=117&session-id=5e5a589f511440d0ea38c2b08cad8f9f" />
+  <web-view src="https://hl.hualtek.com/wap/50/pagesOthers/pay?order_id=126&session-id=f221aed5de1f0c9fbb55ec312154e9e1" />
 </template>
 
 <script lang="ts" setup>

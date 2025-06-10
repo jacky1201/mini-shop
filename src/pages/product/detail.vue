@@ -1,18 +1,21 @@
 <template>
   <view class="product-detail">
     <swiper class="product-swiper" indicator-dots autoplay circular>
-      <swiper-item class="swiper-item">
-        <view class="image"> </view>
+      <swiper-item class="swiper-item" v-for="img in detailInfo.slider_image">
+        <image
+          :src="img"
+          mode="scaleToFill"
+        />
       </swiper-item>
     </swiper>
 
     <view class="product-info">
       <view class="product-title">
-        <text>商品名称</text>
+        <text>{{ detailInfo.name }}</text>
         <!-- star-filled -->
         <uni-icons type="star" size="24" />
       </view>
-      <view class="product-price">￥99.99</view>
+      <view class="product-price">￥{{ detailInfo.price }}</view>
       <view class="product-specs">
         <view class="specs-title">
           <image :src="specsIcon" class="specs-icon" />
@@ -98,6 +101,23 @@
   import cartIcon from '@/static/product/cart-icon.png'
   import msgIcon from '@/static/product/msg-icon.png'
   import specsIcon from '@/static/product/specs-icon.png'
+  import goodsAPI from '@/api/goods';
+  
+  onLoad((option)=>{
+    if(option){
+      getGoodsDetail(option.id)
+    }
+  })
+
+  const detailInfo = ref()
+  const getGoodsDetail = async (id:string|number) => {
+    const res = await goodsAPI.goodsDetail({
+      id
+    })
+    detailInfo.value = res.data.goodsDetail
+  }
+
+
   const showSpecRef = ref()
   const specs = ref([
     { name: '选择版本：', options: ['标准版', '豪华版'], type: 'version' },
@@ -139,7 +159,7 @@
     .swiper-item {
       width: 100%;
       height: 100%;
-      background-color: #f5f5f5;
+      // background-color: #f5f5f5;
       .image {
         width: 100%;
         height: 100%;
