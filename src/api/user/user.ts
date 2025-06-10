@@ -11,7 +11,7 @@ export default {
       },
     })
   },
-  async getUser() {
-    return await http.get(`${baseApi}/vipInfo/vipUser`, {})
+  async uploadImages(index: string, data: Partial<UniApp.UploadFileOption>) {
+    return await http.upload(`/Common/uploadFile`, data)
   },
 }

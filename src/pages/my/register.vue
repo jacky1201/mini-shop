@@ -1,13 +1,19 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import staticImage from '@/components/staticImage.vue'
+  import userApi from '@/api/user/user'
   const nickname = ref('')
   const gender = ref('')
   const phone = ref('')
   const birthYear = ref('')
   const birthMonth = ref('')
   const isAgree = ref(false)
-
+  const userInfo = reactive({
+    userName: '',
+    avatar: '',
+    gender: 'male',
+    phone: '',
+  })
   const genderOptions = [
     { text: '男', value: 'male' },
     { text: '女', value: 'female' },
@@ -27,9 +33,16 @@
   const goBack = () => {
     uni.navigateBack({ delta: 1 })
   }
-
+  function setUserName(e: any) {
+    const { value } = e.detail
+    userInfo.userName = value
+  }
   const bindAvatar = (e: any) => {
     console.log('头像上传成功', e.detail.avatarUrl)
+
+    userApi.uploadImages('userAvatarUrl', { filePath: e.detail.avatarUrl, name: 'file' }).then((result: any) => {
+      userInfo.avatar = result.url
+    })
   }
 </script>
 
@@ -40,7 +53,7 @@
 
       <!-- 头像上传 -->
       <view class="avatar-upload">
-        <image src="/static/images/casetify-logo.png" class="avatar" />
+        <image :src="userInfo.avatar ? userInfo.avatar : '/static/images/casetify-logo.png'" class="avatar" />
         <button class="edit-icon" open-type="chooseAvatar" @chooseavatar="bindAvatar">
           <staticImage src="/static/my/user-edit.png" width="36rpx" height="36rpx"></staticImage>
         </button>
@@ -50,13 +63,13 @@
       <view class="form-group">
         <view class="form-item">
           <text class="label">昵称</text>
-          <uni-easyinput v-model="nickname" placeholder="请输入昵称"></uni-easyinput>
+          <uni-easyinput type="nickname" v-model="userInfo.userName" placeholder="请输入昵称" @blur="setUserName" />
         </view>
 
         <view class="form-item">
           <text class="label">性别</text>
           <uni-data-select
-            v-model="gender"
+            v-model="userInfo.gender"
             :localdata="genderOptions"
             @change="(e: any) => (gender = genderOptions[e.detail.value].value)"
           ></uni-data-select>
@@ -64,7 +77,7 @@
 
         <view class="form-item">
           <text class="label">手机号码</text>
-          <input type="number" v-model="phone" placeholder="请输入手机号" placeholder-class="placeholder" />
+          <input type="number" v-model="userInfo.phone" placeholder="请输入手机号" placeholder-class="placeholder" />
         </view>
 
         <view class="form-item birth-date">
