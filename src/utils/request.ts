@@ -33,7 +33,7 @@ uni.addInterceptor('request', httpInterceptor)
 uni.addInterceptor('uploadFile', httpInterceptor)
 
 interface Data<T> {
-  code: string
+  code: number
   msg: string
   data: T
 }
@@ -75,12 +75,60 @@ function request<T>(options: UniApp.RequestOptions) {
   })
 }
 
+interface uploadResp {
+  fileSize: number
+  fileType: string
+  fileWebUrl: string
+  finalFilePath: string
+  realFileName: string
+  srcFileName: string
+}
+function uploadFile<T>(options: UniApp.UploadFileOption): Promise<Data<T>> {
+  uni.showLoading({ title: '上传中...' })
+  return new Promise((resolve, reject) => {
+    uni.uploadFile({
+      ...options,
+      success(res) {
+        const data = JSON.parse(res.data) as Data<T>
+        if (data.code !== 0) {
+          uni.showModal({
+            title: '提示',
+            showCancel: false,
+            confirmColor: 'rgb(251,93,93)',
+            content: '上传失败，请稍后再试',
+          })
+          reject(false) // 失败回调
+          return
+        }
+
+        resolve(data.data as Data<T>)
+      },
+      fail(err) {
+        uni.showModal({
+          title: '错误',
+          showCancel: false,
+          confirmColor: 'rgb(251,93,93)',
+          content: err.errMsg,
+        })
+        reject(false)
+      },
+      complete() {
+        uni.hideLoading()
+        uni.stopPullDownRefresh()
+      },
+    })
+  })
+}
+
 const http = {
   get<T = any>(url: string, params: object, conifg?: UniApp.RequestOptions): Promise<Data<T>> {
     return request<T>({ url, data: params, ...conifg, method: 'GET' })
   },
   post<T = any>(url: string, data: object, conifg?: UniApp.RequestOptions): Promise<Data<T>> {
     return request<T>({ url, data, ...conifg, method: 'POST' })
+  },
+  upload<T = uploadResp[]>(url: string, data: Partial<UniApp.UploadFileOption>): Promise<Data<T>> {
+    return uploadFile<T>({ url, ...data })
   },
 }
 export default http

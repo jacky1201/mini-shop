@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  import navTabs  from '@/components/navTabs.vue'
+  import navTabs from '@/components/navTabs.vue'
   import goodsAPI from '@/api/goods'
   interface NavItem {
     key: string
@@ -10,34 +10,37 @@
   // 导航数据
   const navItems = ref<NavItem[]>([
     { key: 'all', label: '全部12' },
-    { key: 'all2', label: '联名系列'},
+    { key: 'all2', label: '联名系列' },
     { key: 'all3', label: '艺术家精选' },
     { key: 'all4', label: '明星同款' },
     { key: 'all5', label: '玩转方案' },
   ])
 
-
-  onLoad(()=>{
+  onLoad(() => {
     getCategory()
   })
 
-  const getCategory = ()=>{
-    goodsAPI.goodsCate({}).then(res=>{
+  const getCategory = () => {
+    goodsAPI.goodsCate({}).then((res) => {
       console.log(res)
-      navItems.value = res.data.map((item:any)=>{ return { key: item.id, label: item.name} })
+      navItems.value = res.data.map((item: any) => {
+        return { key: item.id, label: item.name }
+      })
       activeNavId.value = res.data[0].id
       categoryChange(res.data[0].id)
     })
   }
 
-  const categoryChange = (id:string|number)=>{
-      goodsAPI.cateGoods({cate_id:id,limit:99,page:1}).then(res=>{
-        if(res.data.total > 0 ){
-          products.value = res.data.data.map((item:any)=>{ return { id: item.id, name: item.name, price: item.price, slider_image: JSON.parse(item.slider_image)[0] } })
-        }else{
-          products.value = []
-        }
-      })
+  const categoryChange = (id: string | number) => {
+    goodsAPI.cateGoods({ cate_id: id, limit: 99, page: 1 }).then((res) => {
+      if (res.data.total > 0) {
+        products.value = res.data.data.map((item: any) => {
+          return { id: item.id, name: item.name, price: item.price, slider_image: JSON.parse(item.slider_image)[0] }
+        })
+      } else {
+        products.value = []
+      }
+    })
   }
   // 状态栏高度
   const statusBarHeight = ref(0)
@@ -100,17 +103,12 @@
     </view>
 
     <!-- 导航栏 -->
-    <nav-tabs :tabs="navItems" :defaultActiveId="activeNavId"  @change="categoryChange" />
-    
+    <nav-tabs :tabs="navItems" :defaultActiveId="activeNavId" @change="categoryChange" />
 
     <!-- 商品列表 -->
     <view class="product-grid">
       <view class="product-card" v-for="product in products" :key="product.id" @click="goToDetail(product.id)">
-        <image
-        class="product-image-placeholder"
-          :src="product.slider_image"
-          mode="scaleToFill"
-        />
+        <image class="product-image-placeholder" :src="product.slider_image" mode="scaleToFill" />
         <view class="product-info">
           <text class="product-name">{{ product.name }}</text>
           <text class="product-price">¥ {{ product.price }}</text>

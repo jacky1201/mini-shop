@@ -1,11 +1,8 @@
 <template>
   <view class="product-detail">
     <swiper class="product-swiper" indicator-dots autoplay circular>
-      <swiper-item class="swiper-item" v-for="img in detailInfo.slider_image">
-        <image
-          :src="img"
-          mode="scaleToFill"
-        />
+      <swiper-item class="swiper-item" v-for="img in detailInfo.slider_image" :key="img">
+        <image :src="img" mode="scaleToFill" />
       </swiper-item>
     </swiper>
 
@@ -13,10 +10,10 @@
       <view class="product-title">
         <text>{{ detailInfo.name }}</text>
         <!-- star-filled -->
-        <uni-icons type="star" size="24" />
+        <!-- <uni-icons type="star" size="24" /> -->
       </view>
       <view class="product-price">￥{{ detailInfo.price }}</view>
-      <view class="product-specs">
+      <view class="product-specs" v-if="detailInfo.spec == 2">
         <view class="specs-title">
           <image :src="specsIcon" class="specs-icon" />
           <text>产品规格</text>
@@ -26,6 +23,10 @@
           <uni-icons type="right" size="12" />
         </view>
       </view>
+    </view>
+    <view class="product-description" v-if="detailDesc">
+      <view class="title">商品详情</view>
+      <rich-text :nodes="detailDesc"></rich-text>
     </view>
     <view class="button-box">
       <view class="lt">
@@ -44,20 +45,24 @@
           <uni-icons type="closeempty" size="24" @click="closeSpec" />
         </view>
         <swiper class="modal-swiper">
-          <swiper-item class="modal-item">
-            <view class="modal-img"></view>
+          <swiper-item class="modal-item" v-for="(img, index) in skuInfo.image" :key="index">
+            <image class="modal-img" :src="img"></image>
           </swiper-item>
         </swiper>
         <view class="modal-body">
           <view class="spec-info">
             <view class="lt">
-              <view class="price"> ￥99.99 </view>
+              <view class="price"> ￥{{ skuInfo.price }} </view>
             </view>
             <view class="rt">
-              <view class="spec-code"> 商品编码：1234567890 </view>
+              <view class="spec-code"> 商品编码：{{ skuInfo.code }} </view>
             </view>
           </view>
-          <scroll-view scroll-y style="height: 360rpx">
+          <view class="spec-item" v-if="buyType == 1">
+            <view class="spec-name"> 商品数量 </view>
+            <input type="number" v-model="skuInfo.stock" class="picker-box" />
+          </view>
+          <scroll-view v-if="false" scroll-y style="height: 360rpx">
             <view class="spec-item" v-for="(spec, index) in specs" :key="index">
               <view class="spec-name">{{ spec.name }}</view>
               <view class="options-box">
@@ -101,22 +106,35 @@
   import cartIcon from '@/static/product/cart-icon.png'
   import msgIcon from '@/static/product/msg-icon.png'
   import specsIcon from '@/static/product/specs-icon.png'
-  import goodsAPI from '@/api/goods';
-  
-  onLoad((option)=>{
-    if(option){
+  import goodsAPI from '@/api/goods'
+  import { formatRichText } from '@/utils/util'
+  import cartApi from '@/api/cart'
+  import { success } from '@/utils/message'
+  onLoad((option) => {
+    if (option) {
+      goodsId.value = option.id
       getGoodsDetail(option.id)
     }
   })
-
+  const goodsId = ref()
   const detailInfo = ref()
-  const getGoodsDetail = async (id:string|number) => {
+  const detailDesc = ref()
+  const skuInfo = ref({})
+  const getGoodsDetail = async (id: string | number) => {
     const res = await goodsAPI.goodsDetail({
-      id
+      id,
     })
     detailInfo.value = res.data.goodsDetail
+    detailDesc.value = formatRichText(res.data.goodsContent.content)
+    if (res.data.goodsDetail.spec == 1) {
+      skuInfo.value = {
+        image: res.data.goodsDetail.slider_image,
+        price: res.data.goodsDetail.price,
+        stock: res.data.goodsDetail.stock || 1,
+        code: goodsId.value,
+      }
+    }
   }
-
 
   const showSpecRef = ref()
   const specs = ref([
@@ -142,9 +160,26 @@
     selectedSpecs.value[index] = option
   }
 
-  const confirmSpecs = () => {
-    console.log('Selected specs:', selectedSpecs.value)
-    closeSpec()
+  // 1是购买 2 是加入购物车
+  const confirmSpecs = (optType = 1) => {
+    if (buyType.value == 1) {
+      // 立即购买逻辑
+      uni.showToast({
+        title: '立即购买功能待实现',
+        icon: 'none',
+      })
+    } else {
+      cartApi
+        .addCart({
+          goods_id: goodsId.value,
+          rule: [],
+          num: skuInfo.value.stock,
+        })
+        .then((res) => {
+          success('已加入购物车')
+          closeSpec()
+        })
+    }
   }
 </script>
 
@@ -210,9 +245,18 @@
   }
 
   .product-description {
-    font-size: 28rpx;
-    color: #666;
-    margin-top: 10rpx;
+    margin-top: 40rpx;
+    background-color: #fff;
+    width: 100%;
+    padding-bottom: calc(100rpx + constant(safe-area-inset-bottom));
+    padding-bottom: calc(100rpx + env(safe-area-inset-bottom));
+    .title {
+      font-size: 32rpx;
+      font-weight: bold;
+      color: #1a1a1a;
+      padding: 20rpx 40rpx;
+      border-bottom: 2rpx solid rgba(0, 0, 0, 0.1);
+    }
   }
 
   .button-box {
@@ -282,7 +326,6 @@
       .modal-img {
         width: 364rpx;
         height: 100%;
-        background-color: #f5f5f5;
       }
     }
   }
