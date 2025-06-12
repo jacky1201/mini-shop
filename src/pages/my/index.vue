@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import staticImage from '@/components/staticImage.vue'
+  import userApi from '@/api/user/user'
   interface OrderStatus {
     icon: string
     text: string
@@ -35,20 +36,41 @@
       url: '/pages/my/register',
     })
   }
+  const getPhoneNumber = (e:any)=>{
+    let { code,errMsg } = e.detail
+    if (errMsg != 'getPhoneNumber:ok') {
+      console.log('用户拒绝了', e)
+      return;
+    }
+
+    userApi.bindPhone({code}).then(()=>{
+      console.log('绑定成功')
+      // uni.showToast({
+      //   title: '绑定成功',
+      //   icon: 'success',
+      //   duration: 2000
+      // })
+      navigateToRegister()
+    }).catch(()=>{
+      console.log('绑定失败')
+    })
+  }
 </script>
 
 <template>
   <view class="my-container">
     <!-- 未登录状态 -->
     <view v-if="!isLoggedIn" class="member-card not-logged-in">
-      <view class="user-info" @click="navigateToRegister">
+
+      <button class="user-info" plain open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">
         <view class="avatar pink-bg">
           <view class="casetify-logo">CASETIFY</view>
         </view>
         <view class="info">
           <view class="login-text">登陆/注册</view>
         </view>
-      </view>
+      </button>
+      
     </view>
 
     <!-- 已登录状态 -->
@@ -168,6 +190,9 @@
     display: flex;
     align-items: center;
     width: 50%;
+    margin: 0;
+    background-color: transparent;
+    box-sizing: content-box;
     .avatar {
       width: 100rpx;
       height: 100rpx;
@@ -374,5 +399,9 @@
         color: #333;
       }
     }
+  }
+
+  button[plain] {
+    border: 0
   }
 </style>
