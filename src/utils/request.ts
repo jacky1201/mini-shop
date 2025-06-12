@@ -101,7 +101,7 @@ function uploadFile<T>(options: UniApp.UploadFileOption): Promise<Data<T>> {
           return
         }
 
-        resolve(data.data as Data<T>)
+        resolve(data as Data<T>)
       },
       fail(err) {
         uni.showModal({
