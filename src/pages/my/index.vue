@@ -43,13 +43,14 @@
       return;
     }
 
-    userApi.bindPhone({code}).then(()=>{
+    userApi.bindPhone({code}).then((res)=>{
       console.log('绑定成功')
       // uni.showToast({
       //   title: '绑定成功',
       //   icon: 'success',
       //   duration: 2000
       // })
+      uni.setStorageSync('userInfo',JSON.stringify({phone:res.data}))
       navigateToRegister()
     }).catch(()=>{
       console.log('绑定失败')

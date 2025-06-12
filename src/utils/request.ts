@@ -19,12 +19,13 @@ const httpInterceptor = {
     // 3. 添加小程序端请求头标识
     options.header = {
       ...options.header,
-      'source-client': 'miniapp',
+      'Content-type': 'application/json',
+      'X-CSRF-TOKEN': 'miniapp',
     }
     // 4. 添加 token 请求头标识
     // const memberStore = useMemberStore()
     const token = useUserStore().getToken()
-    if (token) options.header.Authorization = token
+    if (token) options.header.Authorization = 'Bearer ' + token
   },
 }
 
@@ -43,10 +44,33 @@ function request<T>(options: UniApp.RequestOptions) {
     uni.request({
       ...options,
       // 响应成功
-      success(res) {
+      async success(res) {
         // 状态码 2xx， axios 就是这样设计的
         if (res.statusCode >= 200 && res.statusCode < 300) {
           // 2.1 提取核心数据 res.data
+          const data = res.data as Data<T>
+          if (data.code == 403) {
+            const token = await useUserStore().refToken()
+            console.log('token', token)
+            if (token) {
+              const data = await request(options)
+              resolve(data as Data<T>)
+              return false
+            }
+          }
+
+          if (data.code != 0) {
+            uni.showModal({
+              title: '提示',
+              showCancel: false,
+              content: data.msg,
+              success() {
+                reject(data)
+              },
+            })
+
+            return false
+          }
           resolve(res.data as Data<T>)
         } else if (res.statusCode === 401) {
           // 401错误  -> 清理用户信息，跳转到登录页

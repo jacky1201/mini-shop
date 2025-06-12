@@ -12,8 +12,9 @@ export const useUserStore = defineStore(
     }
 
     const refToken = async () => {
-      const token = await userApi.userLogin()
-      setToken(token as string)
+      let { token } = await userApi.userLogin<{ token: string }>()
+      console.log('refToken', token)
+      setToken(token)
 
       return token
     }

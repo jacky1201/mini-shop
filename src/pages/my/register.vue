@@ -2,18 +2,26 @@
   import { ref } from 'vue'
   import staticImage from '@/components/staticImage.vue'
   import userApi from '@/api/user/user'
-  const nickname = ref('')
-  const gender = ref('')
-  const phone = ref('')
-  const birthYear = ref('')
-  const birthMonth = ref('')
-  const isAgree = ref(false)
+
+  const isAgree = ref(true)
   const userInfo = reactive({
     userName: '',
     avatar: '',
-    gender: 'male',
     phone: '',
   })
+
+  onLoad(()=>{
+    getUserInfo()
+  })
+
+  const getUserInfo = ()=>{
+    userApi.getUserInfo().then((result: any) => {
+      console.log("result", result.data)
+      userInfo.userName = result.data.userInfo.nickname
+      userInfo.avatar = result.data.userInfo.avatar
+      userInfo.phone = result.data.userInfo.phone
+    })
+  }
   const genderOptions = [
     { text: '男', value: 'male' },
     { text: '女', value: 'female' },
@@ -66,39 +74,39 @@
           <uni-easyinput type="nickname" v-model="userInfo.userName" placeholder="请输入昵称" @blur="setUserName" />
         </view>
 
-        <view class="form-item">
+        <!-- <view class="form-item">
           <text class="label">性别</text>
           <uni-data-select
             v-model="userInfo.gender"
             :localdata="genderOptions"
             @change="(e: any) => (gender = genderOptions[e.detail.value].value)"
           ></uni-data-select>
-        </view>
+        </view> -->
 
         <view class="form-item">
           <text class="label">手机号码</text>
-          <input type="number" v-model="userInfo.phone" placeholder="请输入手机号" placeholder-class="placeholder" />
+          <uni-easyinput disabled  v-model="userInfo.phone" placeholder="请输入手机号" placeholder-class="placeholder" />
         </view>
 
-        <view class="form-item birth-date">
+        <!-- <view class="form-item birth-date">
           <text class="label">出生年月</text>
           <view class="date-pickers">
             <uni-datetime-picker type="date" v-model="birthYear" />
           </view>
-        </view>
+        </view> -->
       </view>
 
       <!-- 隐私协议 -->
-      <!-- <view class="privacy-agreement">
-        <checkbox :checked="isAgree" @tap="isAgree = !isAgree" color="#000" />
+      <view class="privacy-agreement">
+        <radio  :checked="isAgree" @click="isAgree=!isAgree" color="#000" />
         <text class="agreement-text">
           我已阅读并同意 CASETiFY 的
           <text class="link">《隐私条款》</text>
         </text>
-      </view> -->
+      </view>
 
       <!-- 注册按钮 -->
-      <button class="register-btn" @tap="handleRegister"> 立即加入会员 </button>
+      <button class="register-btn" @tap="handleRegister"> 保存修改 </button>
     </view>
   </view>
 </template>
@@ -233,4 +241,8 @@
       opacity: 0.8;
     }
   }
+
+
+
+
 </style>
