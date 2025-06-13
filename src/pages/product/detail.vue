@@ -31,7 +31,7 @@
     <view class="button-box">
       <view class="lt">
         <image class="cart-icon" :src="msgIcon" mode="aspectFit" @click="addToCart"></image>
-        <image class="msg-icon" :src="cartIcon" mode="aspectFit"></image>
+        <image class="msg-icon" :src="cartIcon" @click="gotoCart" mode="aspectFit"></image>
       </view>
       <view class="rt">
         <button class="add-to-cart" @click="addToCart">加入购物车</button>
@@ -58,9 +58,9 @@
               <view class="spec-code"> 商品编码：{{ skuInfo.code }} </view>
             </view>
           </view>
-          <view class="spec-item" v-if="buyType == 1">
+          <view class="spec-item" >
             <view class="spec-name"> 商品数量 </view>
-            <input type="number" v-model="skuInfo.stock" class="picker-box" />
+            <uni-number-box :min="1"  :value="skuInfo.stock" class="picker-box" background="#fff"  :width="50"/>
           </view>
           <scroll-view v-if="false" scroll-y style="height: 360rpx">
             <view class="spec-item" v-for="(spec, index) in specs" :key="index">
@@ -119,7 +119,17 @@
   const goodsId = ref()
   const detailInfo = ref()
   const detailDesc = ref()
-  const skuInfo = ref({})
+  const skuInfo = ref<{
+    image:string
+    price:number
+    stock:number
+    code:string
+  }>({
+    image: '',
+    price: 0,
+    stock: 0,
+    code: '',
+  })
   const getGoodsDetail = async (id: string | number) => {
     const res = await goodsAPI.goodsDetail({
       id,
@@ -161,12 +171,16 @@
   }
 
   // 1是购买 2 是加入购物车
-  const confirmSpecs = (optType = 1) => {
+  const confirmSpecs = () => {
     if (buyType.value == 1) {
-      // 立即购买逻辑
-      uni.showToast({
-        title: '立即购买功能待实现',
-        icon: 'none',
+      let param = [{id: parseInt(goodsId.value), num: skuInfo.value.stock, rule_id: 0}];
+      uni.setStorage({
+						key: 'CREATE_ORDER',
+						data: JSON.stringify(param)
+					})
+      
+      uni.navigateTo({
+        url: `/pages/order/confirm`
       })
     } else {
       cartApi
@@ -181,13 +195,19 @@
         })
     }
   }
+
+
+  const gotoCart = ()=>{
+    uni.switchTab({
+      url:'/pages/shopCart/index',
+    })
+  }
 </script>
 
 <style lang="scss" scoped>
-  .product-detail {
-    // padding: 20rpx;
+  :deep(.uni-numbox) {
+    align-items: center;
   }
-
   .product-swiper {
     width: 100%;
     height: 1000rpx;
@@ -475,4 +495,6 @@
       cursor: pointer;
     }
   }
+
+
 </style>

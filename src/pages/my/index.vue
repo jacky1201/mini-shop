@@ -2,6 +2,7 @@
   import { ref } from 'vue'
   import staticImage from '@/components/staticImage.vue'
   import userApi from '@/api/user/user'
+import { useUserStore } from '@/store/user';
   interface OrderStatus {
     icon: string
     text: string
@@ -25,11 +26,24 @@
     id: '23333',
     type: '基础会员',
     points: 0,
+    avatar:'',
+    nickname:'',
   })
 
   // 登录状态
   const isLoggedIn = ref(false)
 
+  onShow(()=>{
+    getUserInfo()
+    isLoggedIn.value = useUserStore().getToken()?true:false
+  })
+
+  const getUserInfo = ()=>{
+    userApi.getUserInfo().then((result: any) => {
+      memberInfo.value.nickname = result.data.userInfo.nickname
+      memberInfo.value.avatar = result.data.userInfo.avatar
+    })
+  }
   // 跳转到注册页面
   const navigateToRegister = () => {
     uni.navigateTo({
@@ -44,16 +58,13 @@
     }
 
     userApi.bindPhone({code}).then((res)=>{
-      console.log('绑定成功')
       // uni.showToast({
       //   title: '绑定成功',
       //   icon: 'success',
       //   duration: 2000
       // })
-      uni.setStorageSync('userInfo',JSON.stringify({phone:res.data}))
       navigateToRegister()
     }).catch(()=>{
-      console.log('绑定失败')
     })
   }
 </script>
@@ -76,26 +87,24 @@
 
     <!-- 已登录状态 -->
     <view v-else class="member-card logged-in">
-      <view class="user-info">
-        <view class="avatar">
-          <view class="casetify-logo">CASETIFY</view>
-        </view>
+      <view class="user-info" @click="navigateToRegister">
+        <image class="avatar" v-if="memberInfo.avatar" :src="memberInfo.avatar" />
         <view class="info">
-          <view class="nickname">
-            {{ memberInfo.id }}
-            <staticImage src="/static/my/user-edit.png" width="36rpx" height="36rpx"></staticImage>
+          <view class="nickname" >
+            {{ memberInfo.nickname }}
+            <staticImage src="/static/my/user-edit.png" style="margin-left: 10rpx;" width="36rpx" height="36rpx"></staticImage>
           </view>
-          <view class="member-type">{{ memberInfo.type }}</view>
+          <!-- <view class="member-type">{{ memberInfo.type }}</view> -->
         </view>
       </view>
 
-      <view class="points-info">
+      <!-- <view class="points-info">
         <text class="points">{{ memberInfo.points }}</text>
         <text class="label">积点</text>
         <text class="check-benefits">查看会员权益</text>
-      </view>
+      </view> -->
 
-      <view class="qr-code"></view>
+      <!-- <view class="qr-code"></view> -->
     </view>
 
     <!-- 优惠券和心愿单 -->
@@ -190,7 +199,7 @@
   .user-info {
     display: flex;
     align-items: center;
-    width: 50%;
+    // width: 50%;
     margin: 0;
     background-color: transparent;
     box-sizing: content-box;

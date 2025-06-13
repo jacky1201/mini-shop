@@ -2,7 +2,7 @@
   <!-- 购物车 -->
   <view class="content">
     <view class="cart-list">
-      <uni-swipe-action-item v-for="(item, index) in cartList" :key="index" :right-options="actionRightOptions"  @click="delCart(index)">
+      <uni-swipe-action-item v-for="(item, index) in cartList" :key="index" :right-options="actionRightOptions"  @click="delCart(item)">
         <view class="cart-item">
           <view class=check-box>
               <radio 
@@ -12,15 +12,22 @@
                 style="transform:scale(0.7)"
                 @click="checkItem(index)"
                 />
-              <view class="image"></view>
+              <image class="image" :src="item.images" />
               <view class="cart-info">
-                  <view class="prod-name">{{ item.productName }}</view>
-                  <view class="spec-name">{{ item.specsName }}</view>
+                  <view class="prod-name">{{ item.title }}</view>
+                  <!-- <view class="spec-name">{{ item.specsName }}</view> -->
               </view>
               <view class="price">￥{{ item.price }}</view>
             </view>
             <view class="num-box">
-              <uni-number-box  background="#fff" color="#1a1a1a" style="border:1rpx solid #C8C9CC;border-radius: 6rpx 6rpx 6rpx 6rpx;" v-model="item.num" ></uni-number-box>
+              <uni-number-box  
+                background="#fff" 
+                color="#1a1a1a" 
+                style="border:1rpx solid #C8C9CC;border-radius: 6rpx 6rpx 6rpx 6rpx;" 
+                v-model="item.goods_num"
+                @change="changeNum(item)" 
+                :min="1"
+                ></uni-number-box>
             </view>
         </view>
       </uni-swipe-action-item>
@@ -45,47 +52,25 @@
 </template>
 
 <script lang="ts" setup>
-  const cartList = ref([
-    {
-      productName:'测试商品1',
-      price:123,
-      num:1,
-      imgUrl:"",
-      isChecked:true,
-      specsName:'测试规格',
-    },
-    {
-      productName:'测试商品2',
-      price:123,
-      num:1,
-      imgUrl:"",
-      isChecked:true,
-      specsName:'测试规格',
-    },
-    {
-      productName:'测试商品3',
-      price:123,
-      num:1,
-      imgUrl:"",
-      isChecked:true,
-      specsName:'测试规格',
-    },{
-      productName:'测试商品4',
-      price:123,
-      num:1,
-      imgUrl:"",
-      isChecked:true,
-      specsName:'测试规格',
-    },
-    {
-      productName:'测试商5',
-      price:123,
-      num:1,
-      imgUrl:"",
-      isChecked:true,
-      specsName:'测试规格',
-    }
-  ])
+import cartApi from '@/api/cart';
+import { error } from '@/utils/message';
+  interface CartItem {
+    create_time: string
+    goods_id: number
+    goods_num: number
+    id: number
+    images: string
+    original_price: string
+    price: string | number
+    rule_id: number
+    rule_text: string
+    title: string
+    total_amount: string
+    update_time: string
+    user_id: number
+    isChecked?:boolean
+  }
+  const cartList = ref<CartItem[]>([])
 
   const actionRightOptions = [
       {
@@ -116,14 +101,25 @@
     let total = 0
     cartList.value.forEach(item=>{
       if(item.isChecked){
-        total += item.price * item.num
+        total += Number(item.price) * item.goods_num
       }
     })
-    return total
+    return total.toFixed(2)
   })
 
-  const delCart = (index:number)=>{
-    cartList.value.splice(index,1)
+  const delCart = (item:CartItem)=>{
+      cartApi.remove({
+        id: item.id
+      }).then(res=>{
+        getShopCartList()
+      })
+  }
+
+  const changeNum = (data:CartItem)=>{
+    cartApi.changeNum({
+      id: data.id,
+      num: data.goods_num
+    })
   }
 
   // 结算按钮禁用
@@ -132,13 +128,46 @@
     return index === -1
   })
 
+
+
+  const getShopCartList = ()=>{
+    cartApi.myCartList<{data:CartItem[]}>({
+      limit: 999,
+			page: 1
+    }).then(res=>{
+      cartList.value = res.data.data.map(item=> { return { ...item,isChecked:true} })
+    })
+  }
+
   const checkedSubmit = ()=>{
     if(btnDisable.value){
       return false
     }
-    const checkedList = cartList.value.filter(item=> item.isChecked)
-    console.log("submit", checkedList)
+    let goodsData = cartList.value.filter((item)=> item.isChecked ).map(item => {
+            return {
+							id: item.goods_id,
+							cart_id: item.id,
+							price: item.price,
+							num: item.goods_num,
+							rule_id: item.rule_id,
+							type: 1
+						}
+				})
+    if(goodsData.length == 0){
+      error('请先选择结算商品')
+    }
+    uni.setStorage({
+      key: 'CREATE_ORDER',
+      data: JSON.stringify(goodsData)
+    })
+    
+    uni.navigateTo({
+      url: `/pages/order/confirm`
+    })
   }
+  onShow(()=>{
+    getShopCartList()
+  })
 </script>
 
 <style lang="scss" scoped>

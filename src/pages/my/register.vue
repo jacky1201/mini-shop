@@ -2,6 +2,7 @@
   import { ref } from 'vue'
   import staticImage from '@/components/staticImage.vue'
   import userApi from '@/api/user/user'
+  import { success } from '@/utils/message'
 
   const isAgree = ref(true)
   const userInfo = reactive({
@@ -35,6 +36,15 @@
       })
       return
     }
+    userApi.setUserInfo({
+      nickname: userInfo.userName,
+      avatar: userInfo.avatar,
+    }).then(res=>{
+      success('保存成功')
+      setTimeout(()=>{
+        goBack()
+      },1000)
+    })
     // 处理注册逻辑
   }
 
@@ -49,7 +59,7 @@
     console.log('头像上传成功', e.detail.avatarUrl)
 
     userApi.uploadImages('userAvatarUrl', { filePath: e.detail.avatarUrl, name: 'file' }).then((result: any) => {
-      userInfo.avatar = result.url
+      userInfo.avatar = result.data.url
     })
   }
 </script>
