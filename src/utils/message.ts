@@ -37,7 +37,7 @@ const error = (title: string, duration = 1500) => {
     return
   }
   const mask = false
-  const icon = 'error'
+  const icon = 'none'
   uni.showToast({
     title,
     duration,

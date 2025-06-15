@@ -28,7 +28,7 @@ export default {
     return await http.post(`/user/bindPhoneNumber`, data)
   },
   async getUserInfo(data: object = {}) {
-    let res: any = await http.get(`/user/info`, data)
+    const res: any = await http.get(`/user/info`, data)
     uni.setStorageSync('userInfo', res.userInfo)
     return res
   },

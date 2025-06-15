@@ -57,7 +57,7 @@
       }
     },
     {
-      "path": "pages/address/list",
+      "path": "pages/address/index",
       "style": {
         "navigationBarTitleText": "收货地址"
       }
@@ -84,6 +84,12 @@
       "path": "pages/order/detail",
       "style": {
         "navigationBarTitleText": "订单详情"
+      }
+    },
+    {
+      "path": "pages/pay/result",
+      "style": {
+        "navigationBarTitleText": "支付结果"
       }
     },
     {

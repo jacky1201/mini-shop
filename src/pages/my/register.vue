@@ -11,13 +11,13 @@
     phone: '',
   })
 
-  onLoad(()=>{
+  onLoad(() => {
     getUserInfo()
   })
 
-  const getUserInfo = ()=>{
+  const getUserInfo = () => {
     userApi.getUserInfo().then((result: any) => {
-      console.log("result", result.data)
+      console.log('result', result.data)
       userInfo.userName = result.data.userInfo.nickname
       userInfo.avatar = result.data.userInfo.avatar
       userInfo.phone = result.data.userInfo.phone
@@ -36,15 +36,17 @@
       })
       return
     }
-    userApi.setUserInfo({
-      nickname: userInfo.userName,
-      avatar: userInfo.avatar,
-    }).then(res=>{
-      success('保存成功')
-      setTimeout(()=>{
-        goBack()
-      },1000)
-    })
+    userApi
+      .setUserInfo({
+        nickname: userInfo.userName,
+        avatar: userInfo.avatar,
+      })
+      .then((res) => {
+        success('保存成功')
+        setTimeout(() => {
+          goBack()
+        }, 1000)
+      })
     // 处理注册逻辑
   }
 
@@ -95,7 +97,7 @@
 
         <view class="form-item">
           <text class="label">手机号码</text>
-          <uni-easyinput disabled  v-model="userInfo.phone" placeholder="请输入手机号" placeholder-class="placeholder" />
+          <uni-easyinput disabled v-model="userInfo.phone" placeholder="请输入手机号" placeholder-class="placeholder" />
         </view>
 
         <!-- <view class="form-item birth-date">
@@ -108,7 +110,7 @@
 
       <!-- 隐私协议 -->
       <view class="privacy-agreement">
-        <radio  :checked="isAgree" @click="isAgree=!isAgree" color="#000" />
+        <radio :checked="isAgree" @click="isAgree = !isAgree" color="#000" />
         <text class="agreement-text">
           我已阅读并同意 CASETiFY 的
           <text class="link">《隐私条款》</text>
@@ -251,8 +253,4 @@
       opacity: 0.8;
     }
   }
-
-
-
-
 </style>

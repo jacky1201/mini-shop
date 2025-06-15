@@ -58,9 +58,9 @@
               <view class="spec-code"> 商品编码：{{ skuInfo.code }} </view>
             </view>
           </view>
-          <view class="spec-item" >
+          <view class="spec-item">
             <view class="spec-name"> 商品数量 </view>
-            <uni-number-box :min="1"  :value="skuInfo.stock" class="picker-box" background="#fff"  :width="50"/>
+            <uni-number-box :min="1" v-model="skuInfo.stock" class="picker-box" background="#fff" :width="50" />
           </view>
           <scroll-view v-if="false" scroll-y style="height: 360rpx">
             <view class="spec-item" v-for="(spec, index) in specs" :key="index">
@@ -120,10 +120,10 @@
   const detailInfo = ref()
   const detailDesc = ref()
   const skuInfo = ref<{
-    image:string
-    price:number
-    stock:number
-    code:string
+    image: string
+    price: number
+    stock: number
+    code: string
   }>({
     image: '',
     price: 0,
@@ -172,15 +172,16 @@
 
   // 1是购买 2 是加入购物车
   const confirmSpecs = () => {
+    console.log('确认规格', skuInfo.value)
     if (buyType.value == 1) {
-      let param = [{id: parseInt(goodsId.value), num: skuInfo.value.stock, rule_id: 0}];
+      let param = [{ id: parseInt(goodsId.value), num: skuInfo.value.stock, rule_id: 0 }]
       uni.setStorage({
-						key: 'CREATE_ORDER',
-						data: JSON.stringify(param)
-					})
-      
+        key: 'CREATE_ORDER',
+        data: JSON.stringify(param),
+      })
+
       uni.navigateTo({
-        url: `/pages/order/confirm`
+        url: `/pages/order/confirm`,
       })
     } else {
       cartApi
@@ -196,10 +197,9 @@
     }
   }
 
-
-  const gotoCart = ()=>{
+  const gotoCart = () => {
     uni.switchTab({
-      url:'/pages/shopCart/index',
+      url: '/pages/shopCart/index',
     })
   }
 </script>
@@ -495,6 +495,4 @@
       cursor: pointer;
     }
   }
-
-
 </style>
