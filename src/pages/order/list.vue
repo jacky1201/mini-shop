@@ -1,30 +1,34 @@
 <template>
   <view class="content">
-    <navTabs :tabs="navItems" />
+    <navTabs :tabs="navItems" v-model="activeKey" @change="getOrderList" />
     <scroll-view scroll-y class="list-box">
-      <view class="list-item" v-for="order in 3" :key="order">
+      <view class="list-item" v-for="order in orderList" :key="order">
         <view class="order">
-          <view class="status"> 已取消 </view>
-          <view class="desc"> 订单编号：1234567890 </view>
-          <view class="desc"> 下单时间：2020-01-01 12:00:00 </view>
+          <view class="status"> {{ order.status_txt }} </view>
+          <view class="desc"> 订单编号：{{ order.order_no }} </view>
+          <view class="desc"> 下单时间：{{ order.create_time }} </view>
         </view>
         <view class="product">
           <view class="title">商品信息</view>
-          <view class="product-item" v-for="(item, index) in productList" :key="index">
-            <view class="image"></view>
+          <view class="product-item" v-for="(item, index) in order.detail" :key="index">
+            <image
+              class="image"
+              :src="item.logo"
+              mode="scaleToFill"
+            />
             <view class="info">
-              <view class="prod-name">{{ item.productName }}</view>
+              <view class="prod-name">{{ item.goods_name }}</view>
               <view class="price">￥{{ item.price }}</view>
-              <view class="spec-name">{{ item.specsName }}</view>
+              <!-- <view class="spec-name">{{ item.specsName }}</view> -->
             </view>
-            <view class="num"> ×{{ item.num }} </view>
+            <view class="num"> ×{{ item.cart_num }} </view>
           </view>
         </view>
         <view class="total">
-          <view class="total-num"> 共计99件商品 </view>
-          <view class="total-price"> 订单总计：￥999.00 </view>
+          <view class="total-num"> 共计{{ order.totalNum }}件商品 </view>
+          <view class="total-price"> 订单总计：￥{{ order.pay_price }} </view>
         </view>
-        <view class="action-btn">
+        <view class="action-btn" @click="gotoDetail(order.id)">
           <view class="detail">查看详情</view>
         </view>
       </view>
@@ -33,14 +37,15 @@
 </template>
 <script lang="ts" setup>
   import navTabs from '@/components/navTabs.vue'
+  import orderApi from '@/api/order'
   const navItems = [
-    { key: '1', label: '全部' },
-    { key: '2', label: '待付款' },
-    { key: '3', label: '待发货' },
-    { key: '4', label: '待收货' },
-    { key: '5', label: '待收货' },
-    { key: '6', label: '已完成' },
+    { key: -1, label: '全部' },
+    { key: 2, label: '待支付' },
+    { key: 3, label: '待发货' },
+    { key: 4, label: '待收货' },
+    { key: 0, label: '已完成' },
   ]
+  const activeKey = ref(-1)
 
   const productList = ref([
     {
@@ -68,6 +73,34 @@
       specsName: '测试规格',
     },
   ])
+
+  const orderList = ref()
+
+  const getOrderList = (status:string|number)=>{
+    orderApi.orderList({
+      status:status,
+      page:1,
+      limit:999,
+      keywords:'',
+    }).then(res=>{
+      orderList.value = res.data.data.map((item:any)=>{
+        let totalNum = 0
+        item.detail.forEach((goods:any)=>{
+          totalNum += goods.cart_num
+        })
+        return {...item,totalNum}
+      })
+    })
+  }
+
+  const gotoDetail = (id:string|number)=>{
+     uni.navigateTo({
+       url: '/pages/order/detail?orderId='+id,
+     })
+  }
+  onShow(()=>{
+    getOrderList(activeKey.value)
+  })
 </script>
 
 <style lang="scss" scoped>

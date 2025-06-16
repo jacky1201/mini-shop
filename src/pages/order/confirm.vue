@@ -148,7 +148,7 @@
     orderApi.createOrder(trailData.value).then((res) => {
       uni.requestPayment({
         provider: 'wxpay',
-        appId: res.data.appId,
+        orderInfo:'订单编号：'+res.msg,
         timeStamp: res.data.timeStamp,
         nonceStr: res.data.nonceStr,
         package: res.data.package,

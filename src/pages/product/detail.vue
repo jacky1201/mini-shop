@@ -60,7 +60,7 @@
           </view>
           <view class="spec-item">
             <view class="spec-name"> 商品数量 </view>
-            <uni-number-box :min="1" v-model="skuInfo.stock" class="picker-box" background="#fff" :width="50" />
+            <uni-number-box :min="1" :max="skuInfo.stock" v-model="skuInfo.num" class="picker-box" background="#fff" :width="50" />
           </view>
           <scroll-view v-if="false" scroll-y style="height: 360rpx">
             <view class="spec-item" v-for="(spec, index) in specs" :key="index">
@@ -109,7 +109,7 @@
   import goodsAPI from '@/api/goods'
   import { formatRichText } from '@/utils/util'
   import cartApi from '@/api/cart'
-  import { success } from '@/utils/message'
+  import { success, error } from '@/utils/message';
   onLoad((option) => {
     if (option) {
       goodsId.value = option.id
@@ -124,11 +124,13 @@
     price: number
     stock: number
     code: string
+    num:number
   }>({
     image: '',
     price: 0,
     stock: 0,
     code: '',
+    num:0,
   })
   const getGoodsDetail = async (id: string | number) => {
     const res = await goodsAPI.goodsDetail({
@@ -141,6 +143,7 @@
         image: res.data.goodsDetail.slider_image,
         price: res.data.goodsDetail.price,
         stock: res.data.goodsDetail.stock || 1,
+        num:1,
         code: goodsId.value,
       }
     }
@@ -173,8 +176,12 @@
   // 1是购买 2 是加入购物车
   const confirmSpecs = () => {
     console.log('确认规格', skuInfo.value)
+    if(skuInfo.value.num > skuInfo.value.stock){
+      error('库存不足')
+      return  false
+    }
     if (buyType.value == 1) {
-      let param = [{ id: parseInt(goodsId.value), num: skuInfo.value.stock, rule_id: 0 }]
+      let param = [{ id: parseInt(goodsId.value), num: skuInfo.value.num, rule_id: 0 }]
       uni.setStorage({
         key: 'CREATE_ORDER',
         data: JSON.stringify(param),
@@ -188,7 +195,7 @@
         .addCart({
           goods_id: goodsId.value,
           rule: [],
-          num: skuInfo.value.stock,
+          num: skuInfo.value.num,
         })
         .then((res) => {
           success('已加入购物车')

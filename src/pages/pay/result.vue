@@ -24,7 +24,7 @@
         </view>
       </view>
       <view class="btn-group">
-        <navigator url="/pages/order/order?state=0" open-type="redirect" class="mix-btn" :style="{ background: '#1a1a1a' }">查看订单</navigator>
+        <navigator url="/pages/order/list" open-type="reLaunch" class="mix-btn" :style="{ background: '#1a1a1a' }">查看订单</navigator>
         <navigator url="/pages/index/index" open-type="switchTab" class="mix-btn hollow">返回首页</navigator>
       </view>
     </uni-card>

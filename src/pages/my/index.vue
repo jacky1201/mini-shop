@@ -67,6 +67,12 @@ import { useUserStore } from '@/store/user';
     }).catch(()=>{
     })
   }
+
+  const gotoOrderList = (type='all')=>{
+    uni.navigateTo({
+      url:'/pages/order/list?type'+type
+    })
+  }
 </script>
 
 <template>
@@ -128,7 +134,7 @@ import { useUserStore } from '@/store/user';
       <!-- 订单状态 -->
       <view class="section-header">
         <text class="title">我的订单</text>
-        <view class="view-all">
+        <view class="view-all" @click="gotoOrderList('all')">
           查看全部
           <uni-icons type="right" size="12" />
         </view>

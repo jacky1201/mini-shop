@@ -38,7 +38,7 @@ const props = defineProps(
             { key: 5, label: '玩转方案',  },
         ]
       },
-      defaultActiveId: {
+      modelValue: {
         type: Number,
         default: 0
       },
@@ -60,27 +60,28 @@ const activeColor = computed(() => {
 })
 
 // 当前选中的导航项
-const activeNavId = ref(props.defaultActiveId || props.tabs[0]?.key)
-
+const activeNavId = ref(props.modelValue || props.tabs[0]?.key)
 // 监听外部传入的默认选中项变化
 watch(
-  () => props.defaultActiveId,
+  activeNavId,
   (newVal) => {
-    if (newVal !== undefined) {
-      activeNavId.value = newVal
-    }
+    emit('update:modelValue', newVal)
+   
   }
 )
 
 // 切换导航
 const switchNav = (key: string |number) => {
   activeNavId.value = key
-  emit('change', key) // 触发 change 事件，通知父组件
+  setTimeout(()=>{
+    emit('change', key)
+  },500) // 触发 change 事件，通知父组件
 }
 
 // 暴露事件
 const emit = defineEmits<{
   (event: 'change', key: string | number): void
+  (event: 'update:modelValue', key: string | number): void
 }>()
 </script>
 
