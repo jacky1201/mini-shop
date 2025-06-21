@@ -33,7 +33,7 @@
       }
     },
     {
-      "path": "pages/product/detail",
+      "path": "pages/product/product",
       "style": {
         "navigationBarTitleText": "商品详情"
       }
@@ -92,6 +92,13 @@
         "navigationBarTitleText": "支付结果"
       }
     },
+    {
+      "path": "pages/my/collection",
+      "style": {
+        "navigationBarTitleText": "我的心愿单"
+      }
+    },
+    
     {
       "path": "pages/wevView/wevView",
       "style": {

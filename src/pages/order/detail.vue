@@ -1,7 +1,7 @@
 <template>
-  <view class="content"  v-if="orderDetail">
+  <view class="content" v-if="orderDetail">
     <view class="order-box">
-      <view class="status"> {{ orderDetail.status_txt  || '--'}} </view>
+      <view class="status"> {{ orderDetail.status_txt || '--' }} </view>
       <view class="desc">
         <view class="desc-item">
           <view>订单编号：{{ orderDetail.order_no }}</view>
@@ -13,10 +13,12 @@
     <view class="address" v-if="orderDetail.address">
       <view class="title"> 配送地址 </view>
       <view class="info">
-        <view>{{ orderDetail.address.user_name || '--'}}</view>
+        <view>{{ orderDetail.address.user_name || '--' }}</view>
         <view>{{ orderDetail.address.phone }}</view>
       </view>
-      <view class="detail-addr"> {{ orderDetail.address.province + orderDetail.address.city + orderDetail.address.county +orderDetail.address.detail}}</view>
+      <view class="detail-addr">
+        {{ orderDetail.address.province + orderDetail.address.city + orderDetail.address.county + orderDetail.address.detail }}</view
+      >
     </view>
     <view class="product-box">
       <view class="title">
@@ -25,11 +27,7 @@
       </view>
       <view class="list">
         <view class="item" v-for="(item, index) in orderDetail.detail" :key="index">
-          <image
-            class="image"
-            :src="item.logo"
-            mode="scaleToFill"
-          />
+          <image class="image" :src="item.logo" mode="scaleToFill" />
           <view class="info">
             <view class="prod-name">{{ item.goods_name }}</view>
             <view class="price">￥{{ item.price }}</view>
@@ -53,14 +51,19 @@
         <view class="rt">免费配送</view>
       </view>
 
-      <view class="item" style="margin-top: 40rpx" >
+      <view class="item" style="margin-top: 40rpx">
         <view class="lt">实付</view>
         <view class="rt" style="font-weight: 600">￥{{ orderDetail.pay_price }}</view>
       </view>
     </view>
 
     <view class="action-box">
-      <view class="buy-now refund" v-if="orderDetail.pay_status == 2 && orderDetail.refund_status == 1 && orderDetail.detail.length > 0" @click="refund">申请退款</view>
+      <view
+        class="buy-now refund"
+        v-if="orderDetail.pay_status == 2 && orderDetail.refund_status == 1 && orderDetail.detail.length > 0"
+        @click="refund"
+        >申请退款</view
+      >
       <view class="buy-now" v-if="orderDetail.status == 2" @click="orderPay">继续支付</view>
       <view class="buy-now" v-if="orderDetail.status == 4" @click="received">确认收货</view>
     </view>
@@ -68,7 +71,7 @@
 </template>
 <script lang="ts" setup>
   import orderApi from '@/api/order'
-import { success,error } from '@/utils/message';
+  import { success, error } from '@/utils/message'
   const productList = ref([
     {
       productName: '测试商品1',
@@ -98,120 +101,125 @@ import { success,error } from '@/utils/message';
 
   const orderId = ref()
   const orderDetail = ref()
-  const getOrderDetail = ()=>{
-    orderApi.detail({
-      id:orderId.value,
-    }).then(res=>{
-      orderDetail.value = res.data.order
-      console.log("orderDetail", orderDetail.value.status_txt)
-
-      let totalNum = 0
-      orderDetail.value.detail.forEach((goods:any)=>{
-        totalNum += goods.cart_num
+  const getOrderDetail = () => {
+    orderApi
+      .detail({
+        id: orderId.value,
       })
-      orderDetail.value.totalNum = totalNum
-    })
+      .then((res) => {
+        orderDetail.value = res.data.order
+        console.log('orderDetail', orderDetail.value.status_txt)
+
+        let totalNum = 0
+        orderDetail.value.detail.forEach((goods: any) => {
+          totalNum += goods.cart_num
+        })
+        orderDetail.value.totalNum = totalNum
+      })
   }
 
-
   // 取消订单
-  const  cancel=()=> {
-      uni.showModal({
-        content:'确认取消订单操作？',
-        success:({confirm})=>{
-          if(confirm){
-            orderApi.cancel({
-            id:orderId.value,
-            }).then(res=>{
+  const cancel = () => {
+    uni.showModal({
+      content: '确认取消订单操作？',
+      success: ({ confirm }) => {
+        if (confirm) {
+          orderApi
+            .cancel({
+              id: orderId.value,
+            })
+            .then((res) => {
               success('取消成功')
               getOrderDetail()
             })
-          }
-        },
-      })
-    
-  }
-
-  //支付
-  const orderPay = ()=>{
-    orderApi.goPay({
-      order_id:orderDetail.value.id,
-      pay_way:'wechat_pay',
-    }).then(res=>{
-      uni.requestPayment({
-        provider: 'wxpay',
-        timeStamp: res.data.timeStamp,
-        nonceStr: res.data.nonceStr,
-        package: res.data.package,
-        signType: res.data.signType,
-        paySign: res.data.paySign,
-        orderInfo:'订单编号：'+orderDetail.value.id,
-        success(data) {
-          success('支付成功')
-          uni.redirectTo({
-            url: '/pages/pay/result?order_no=' + res.msg,
-          })
-        },
-        fail(e) {
-          error('支付失败')
-          uni.redirectTo({
-            url: '/pages/pay/result?order_no=' + res.msg,
-          })
-        },
-      })
+        }
+      },
     })
   }
 
-  const received = ()=>{
-    uni.showModal({
-        content:'确认收货操作？',
-        success:({confirm})=>{
-          if(confirm){
-            orderApi.received({
-            id:orderId.value,
-            }).then(res=>{
-              success('确认收货成功')
-              getOrderDetail()
+  //支付
+  const orderPay = () => {
+    orderApi
+      .goPay({
+        order_id: orderDetail.value.id,
+        pay_way: 'wechat_pay',
+      })
+      .then((res) => {
+        uni.requestPayment({
+          provider: 'wxpay',
+          timeStamp: res.data.timeStamp,
+          nonceStr: res.data.nonceStr,
+          package: res.data.package,
+          signType: res.data.signType,
+          paySign: res.data.paySign,
+          orderInfo: '订单编号：' + orderDetail.value.id,
+          success(data) {
+            success('支付成功')
+            uni.redirectTo({
+              url: '/pages/pay/result?order_no=' + res.msg,
             })
-          }
-        },
+          },
+          fail(e) {
+            error('支付失败')
+            uni.redirectTo({
+              url: '/pages/pay/result?order_no=' + res.msg,
+            })
+          },
+        })
       })
   }
 
-  const refund = ()=>{
+  const received = () => {
     uni.showModal({
-        content:'确认申请退款操作？',
-        success:({confirm})=>{
-          if(confirm){
-            let detailIds:string[] = []
-            let orderNumData:{order_detail_id:string,num:number}[] = []
-            orderDetail.value.detail.forEach((item:any) => {
-                orderNumData.push({
-                  order_detail_id: item.id,
-                  num: item.cart_num
-                })
-                detailIds.push(item.id)
+      content: '确认收货操作？',
+      success: ({ confirm }) => {
+        if (confirm) {
+          orderApi
+            .received({
+              id: orderId.value,
             })
-            let params = {
-              order_id: orderId.value,
-              order_detail_id:detailIds.join(','),
-              order_num_data:JSON.stringify(orderNumData),
-              refund_type: 1,
-              remark: '用户主动申请退款',
-              apply_refund_reason: '',
-					    refund_img: [],
-            }
-            orderApi.refund(params).then(res=>{
-              success('申请成功')
+            .then((res) => {
+              success('确认收货成功')
               getOrderDetail()
             })
-          }
-        },
-      })
-    
+        }
+      },
+    })
   }
-  onLoad((option)=>{
-    if(option){
+
+  const refund = () => {
+    uni.showModal({
+      content: '确认申请退款操作？',
+      success: ({ confirm }) => {
+        if (confirm) {
+          let detailIds: string[] = []
+          let orderNumData: { order_detail_id: string; num: number }[] = []
+          orderDetail.value.detail.forEach((item: any) => {
+            orderNumData.push({
+              order_detail_id: item.id,
+              num: item.cart_num,
+            })
+            detailIds.push(item.id)
+          })
+          let params = {
+            order_id: orderId.value,
+            order_detail_id: detailIds.join(','),
+            order_num_data: JSON.stringify(orderNumData),
+            refund_type: 1,
+            remark: '用户主动申请退款',
+            apply_refund_reason: '',
+            refund_img: [],
+          }
+          orderApi.refund(params).then((res) => {
+            success('申请成功')
+            getOrderDetail()
+          })
+        }
+      },
+    })
+  }
+  onLoad((option) => {
+    if (option) {
       orderId.value = option.orderId
       getOrderDetail()
     }
@@ -393,7 +401,7 @@ import { success,error } from '@/utils/message';
       border: 1rpx solid #000000;
     }
 
-    .refund{
+    .refund {
       background-color: #fff;
       color: #1a1a1a;
     }

@@ -2,21 +2,22 @@
   import { ref } from 'vue'
   import staticImage from '@/components/staticImage.vue'
   import userApi from '@/api/user/user'
-import { useUserStore } from '@/store/user';
+  import { useUserStore } from '@/store/user'
   interface OrderStatus {
     icon: string
     text: string
+    type: number
   }
 
   const orderStatuses = ref<OrderStatus[]>([
-    { icon: '/static/my/order-1.png', text: '待付款' },
-    { icon: '/static/my/order-2.png', text: '待发货' },
-    { icon: '/static/my/order-3.png', text: '待收货' },
-    { icon: '/static/my/order-4.png', text: '已完成' },
+    { icon: '/static/my/order-1.png', text: '待付款', type: 2 },
+    { icon: '/static/my/order-2.png', text: '待发货', type: 3 },
+    { icon: '/static/my/order-3.png', text: '待收货', type: 4 },
+    { icon: '/static/my/order-4.png', text: '已完成', type: 0 },
   ])
 
   const services = ref([
-    { icon: '/static/my/address.png', text: '我的地址' },
+    { icon: '/static/my/address.png', text: '我的地址', path: '/pages/address/index' },
     // { icon: '📄', text: '申请开票' },
     // { icon: '🛍️', text: '合作采购' },
     // { icon: '📄', text: '占位' },
@@ -26,19 +27,19 @@ import { useUserStore } from '@/store/user';
     id: '23333',
     type: '基础会员',
     points: 0,
-    avatar:'',
-    nickname:'',
+    avatar: '',
+    nickname: '',
   })
 
   // 登录状态
   const isLoggedIn = ref(false)
 
-  onShow(()=>{
+  onShow(() => {
     getUserInfo()
-    isLoggedIn.value = useUserStore().getToken()?true:false
+    isLoggedIn.value = useUserStore().getToken() ? true : false
   })
 
-  const getUserInfo = ()=>{
+  const getUserInfo = () => {
     userApi.getUserInfo().then((result: any) => {
       memberInfo.value.nickname = result.data.userInfo.nickname
       memberInfo.value.avatar = result.data.userInfo.avatar
@@ -50,27 +51,43 @@ import { useUserStore } from '@/store/user';
       url: '/pages/my/register',
     })
   }
-  const getPhoneNumber = (e:any)=>{
-    let { code,errMsg } = e.detail
+  const getPhoneNumber = (e: any) => {
+    let { code, errMsg } = e.detail
     if (errMsg != 'getPhoneNumber:ok') {
       console.log('用户拒绝了', e)
-      return;
+      return
     }
 
-    userApi.bindPhone({code}).then((res)=>{
-      // uni.showToast({
-      //   title: '绑定成功',
-      //   icon: 'success',
-      //   duration: 2000
-      // })
-      navigateToRegister()
-    }).catch(()=>{
+    userApi
+      .bindPhone({ code })
+      .then((res) => {
+        // uni.showToast({
+        //   title: '绑定成功',
+        //   icon: 'success',
+        //   duration: 2000
+        // })
+        navigateToRegister()
+      })
+      .catch(() => {})
+  }
+
+  const gotoServices = (path: string) => {
+    if (isLoggedIn.value === false) {
+      uni.showToast({
+        title: '请先登录',
+        icon: 'none',
+      })
+      return
+    }
+    uni.navigateTo({
+      url: path,
     })
   }
 
-  const gotoOrderList = (type='all')=>{
+  const gotoOrderList = (type = -1) => {
+    console.log('跳转到订单列表，状态：', type)
     uni.navigateTo({
-      url:'/pages/order/list?type'+type
+      url: '/pages/order/list?status=' + type,
     })
   }
 </script>
@@ -79,7 +96,6 @@ import { useUserStore } from '@/store/user';
   <view class="my-container">
     <!-- 未登录状态 -->
     <view v-if="!isLoggedIn" class="member-card not-logged-in">
-
       <button class="user-info" plain open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">
         <view class="avatar pink-bg">
           <view class="casetify-logo">CASETIFY</view>
@@ -88,7 +104,6 @@ import { useUserStore } from '@/store/user';
           <view class="login-text">登陆/注册</view>
         </view>
       </button>
-      
     </view>
 
     <!-- 已登录状态 -->
@@ -96,9 +111,9 @@ import { useUserStore } from '@/store/user';
       <view class="user-info" @click="navigateToRegister">
         <image class="avatar" v-if="memberInfo.avatar" :src="memberInfo.avatar" />
         <view class="info">
-          <view class="nickname" >
+          <view class="nickname">
             {{ memberInfo.nickname }}
-            <staticImage src="/static/my/user-edit.png" style="margin-left: 10rpx;" width="36rpx" height="36rpx"></staticImage>
+            <staticImage src="/static/my/user-edit.png" style="margin-left: 10rpx" width="36rpx" height="36rpx"></staticImage>
           </view>
           <!-- <view class="member-type">{{ memberInfo.type }}</view> -->
         </view>
@@ -115,14 +130,14 @@ import { useUserStore } from '@/store/user';
 
     <!-- 优惠券和心愿单 -->
     <view class="quick-actions">
-      <view class="action-item">
+      <view class="action-item" @click="gotoServices('/pages/coupon/index?type=view')">
         <view class="icon">
           <staticImage src="/static/my/coupon-1.png" width="60rpx" height="60rpx"></staticImage>
         </view>
         <text>我的积分/优惠券</text>
       </view>
       <view class="divider"></view>
-      <view class="action-item">
+      <view class="action-item" @click="gotoServices('/pages/my/collection')">
         <view class="icon">
           <staticImage src="/static/my/collect-1.png" width="60rpx" height="60rpx"></staticImage>
         </view>
@@ -134,14 +149,14 @@ import { useUserStore } from '@/store/user';
       <!-- 订单状态 -->
       <view class="section-header">
         <text class="title">我的订单</text>
-        <view class="view-all" @click="gotoOrderList('all')">
+        <view class="view-all" @click="gotoOrderList(-1)">
           查看全部
           <uni-icons type="right" size="12" />
         </view>
       </view>
       <view class="orders-section">
         <view class="order-status-list">
-          <view v-for="(status, index) in orderStatuses" :key="index" class="status-item">
+          <view v-for="(status, index) in orderStatuses" :key="index" class="status-item" @click="gotoOrderList(status.type)">
             <view class="icon">
               <staticImage :src="status.icon" :alt="status.text" width="60rpx" height="60rpx"></staticImage>
             </view>
@@ -156,7 +171,7 @@ import { useUserStore } from '@/store/user';
       </view>
       <view class="services-section">
         <view class="services-grid">
-          <view v-for="(service, index) in services" :key="index" class="service-item">
+          <view v-for="(service, index) in services" :key="index" @click="gotoServices(service.path)" class="service-item">
             <view class="icon">
               <staticImage :src="service.icon" :alt="service.text" width="60rpx" height="60rpx"></staticImage>
             </view>
@@ -418,6 +433,6 @@ import { useUserStore } from '@/store/user';
   }
 
   button[plain] {
-    border: 0
+    border: 0;
   }
 </style>

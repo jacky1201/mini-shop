@@ -11,11 +11,7 @@
         <view class="product">
           <view class="title">商品信息</view>
           <view class="product-item" v-for="(item, index) in order.detail" :key="index">
-            <image
-              class="image"
-              :src="item.logo"
-              mode="scaleToFill"
-            />
+            <image class="image" :src="item.logo" mode="scaleToFill" />
             <view class="info">
               <view class="prod-name">{{ item.goods_name }}</view>
               <view class="price">￥{{ item.price }}</view>
@@ -76,29 +72,37 @@
 
   const orderList = ref()
 
-  const getOrderList = (status:string|number)=>{
-    orderApi.orderList({
-      status:status,
-      page:1,
-      limit:999,
-      keywords:'',
-    }).then(res=>{
-      orderList.value = res.data.data.map((item:any)=>{
-        let totalNum = 0
-        item.detail.forEach((goods:any)=>{
-          totalNum += goods.cart_num
-        })
-        return {...item,totalNum}
+  const getOrderList = (status: string | number) => {
+    orderApi
+      .orderList({
+        status: status,
+        page: 1,
+        limit: 999,
+        keywords: '',
       })
-    })
+      .then((res) => {
+        orderList.value = res.data.data.map((item: any) => {
+          let totalNum = 0
+          item.detail.forEach((goods: any) => {
+            totalNum += goods.cart_num
+          })
+          return { ...item, totalNum }
+        })
+      })
   }
 
-  const gotoDetail = (id:string|number)=>{
-     uni.navigateTo({
-       url: '/pages/order/detail?orderId='+id,
-     })
+  const gotoDetail = (id: string | number) => {
+    uni.navigateTo({
+      url: '/pages/order/detail?orderId=' + id,
+    })
   }
-  onShow(()=>{
+  onLoad((option) => {
+    if (option) {
+      activeKey.value = Number(option.status)
+      getOrderList(activeKey.value)
+    }
+  })
+  onShow(() => {
     getOrderList(activeKey.value)
   })
 </script>

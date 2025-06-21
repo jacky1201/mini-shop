@@ -73,7 +73,7 @@
   // 跳转到商品详情
   const goToDetail = (id: number) => {
     uni.navigateTo({
-      url: `/pages/product/detail?id=${id}`,
+      url: `/pages/product/product?id=${id}`,
     })
   }
 
@@ -87,23 +87,16 @@
 
 <template>
   <view class="container">
-    <!-- 状态栏占位 -->
-    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
-
     <!-- 顶部标题栏 -->
-    <view class="header">
-      <view class="logo">CASETIFY</view>
+    <!-- <view class="header">
+      <view class="logo">线象失控</view>
       <view class="search-box" @tap="goToSearch">
         <text class="search-icon">🔍</text>
       </view>
-      <view class="header-right">
-        <text class="menu-icon">⋮</text>
-        <text class="cart-icon">⊙</text>
-      </view>
-    </view>
+    </view> -->
 
     <!-- 导航栏 -->
-    <nav-tabs :tabs="navItems" :defaultActiveId="activeNavId" @change="categoryChange" />
+    <nav-tabs :tabs="navItems" v-model="activeNavId" @change="categoryChange" />
 
     <!-- 商品列表 -->
     <view class="product-grid">

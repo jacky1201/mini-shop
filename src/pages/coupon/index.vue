@@ -3,7 +3,7 @@
     <view class="coupon-list">
       <radio-group>
         <view class="item" v-for="(item, index) in couponList" :key="index">
-          <view class="radio">
+          <view class="radio" v-if="!viewType">
             <radio :checked="index === current" />
           </view>
           <view class="cont">
@@ -21,7 +21,7 @@
         </view>
       </radio-group>
     </view>
-    <view class="footer">
+    <view class="footer" v-if="!viewType">
       <view class="footer-btn">确定</view>
     </view>
     <msg-Dialog ref="dialogRef" title="优惠券使用说明" content="我的优惠券期限和内容" />
@@ -31,6 +31,7 @@
 <script lang="ts" setup>
   import couponIcon from '@/static/product/coupon-icon.png'
   import msgDialog from '@/components/msgDialog.vue'
+  import couponApi from '@/api/coupon'
   const current = ref(3)
   const dialogRef = ref()
   const couponList = ref([
@@ -43,6 +44,20 @@
   const moreRuleShow = () => {
     dialogRef.value.open()
   }
+
+  const getCouponList = () => {
+    couponApi.myCouponList({ status: 1, page: 1, limit: 999 }).then((res) => {})
+  }
+
+  const viewType = ref(false)
+  onLoad((option: any) => {
+    // 页面加载时可以获取传入的参数
+    console.log('页面加载，参数:', option)
+    if (option) {
+      viewType.value = option.type === 'view'
+    }
+    getCouponList()
+  })
 </script>
 
 <style lang="scss" scoped>

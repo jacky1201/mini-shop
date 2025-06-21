@@ -10,7 +10,7 @@
       <view class="product-title">
         <text>{{ detailInfo.name }}</text>
         <!-- star-filled -->
-        <!-- <uni-icons type="star" size="24" /> -->
+        <uni-icons :type="favorite ? 'star-filled' : 'star'" size="24" @click="toFavorite" />
       </view>
       <view class="product-price">￥{{ detailInfo.price }}</view>
       <view class="product-specs" v-if="detailInfo.spec == 2">
@@ -109,7 +109,8 @@
   import goodsAPI from '@/api/goods'
   import { formatRichText } from '@/utils/util'
   import cartApi from '@/api/cart'
-  import { success, error } from '@/utils/message';
+  import collectApi from '@/api/collect'
+  import { success, error } from '@/utils/message'
   onLoad((option) => {
     if (option) {
       goodsId.value = option.id
@@ -119,31 +120,33 @@
   const goodsId = ref()
   const detailInfo = ref()
   const detailDesc = ref()
+  const favorite = ref(false)
   const skuInfo = ref<{
     image: string
     price: number
     stock: number
     code: string
-    num:number
+    num: number
   }>({
     image: '',
     price: 0,
     stock: 0,
     code: '',
-    num:0,
+    num: 0,
   })
   const getGoodsDetail = async (id: string | number) => {
     const res = await goodsAPI.goodsDetail({
       id,
     })
     detailInfo.value = res.data.goodsDetail
+    favorite.value = res.data.favorite
     detailDesc.value = formatRichText(res.data.goodsContent.content)
     if (res.data.goodsDetail.spec == 1) {
       skuInfo.value = {
         image: res.data.goodsDetail.slider_image,
         price: res.data.goodsDetail.price,
         stock: res.data.goodsDetail.stock || 1,
-        num:1,
+        num: 1,
         code: goodsId.value,
       }
     }
@@ -176,9 +179,9 @@
   // 1是购买 2 是加入购物车
   const confirmSpecs = () => {
     console.log('确认规格', skuInfo.value)
-    if(skuInfo.value.num > skuInfo.value.stock){
+    if (skuInfo.value.num > skuInfo.value.stock) {
       error('库存不足')
-      return  false
+      return false
     }
     if (buyType.value == 1) {
       let param = [{ id: parseInt(goodsId.value), num: skuInfo.value.num, rule_id: 0 }]
@@ -208,6 +211,28 @@
     uni.switchTab({
       url: '/pages/shopCart/index',
     })
+  }
+
+  // 收藏
+  const toFavorite = () => {
+    if (favorite.value) {
+      collectApi.removeByGoods({ goods_id: goodsId.value }).then((res) => {
+        error('取消收藏')
+        favorite.value = false
+      })
+    } else {
+      collectApi
+        .add({
+          goods_id: goodsId.value,
+          goods_name: detailInfo.value.name,
+          goods_pic: detailInfo.value.slider_image[0],
+          price: detailInfo.value.price,
+        })
+        .then((res) => {
+          error('收藏成功')
+          favorite.value = true
+        })
+    }
   }
 </script>
 

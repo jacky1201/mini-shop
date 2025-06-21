@@ -148,7 +148,7 @@
     orderApi.createOrder(trailData.value).then((res) => {
       uni.requestPayment({
         provider: 'wxpay',
-        orderInfo:'订单编号：'+res.msg,
+        orderInfo: '订单编号：' + res.msg,
         timeStamp: res.data.timeStamp,
         nonceStr: res.data.nonceStr,
         package: res.data.package,
@@ -161,10 +161,11 @@
           })
         },
         fail(e) {
-          error('支付失败')
-          uni.redirectTo({
-            url: '/pages/pay/result?order_no=' + res.msg,
-          })
+          console.error('支付失败', e)
+          error('支付失败：' + e.errMsg)
+          // uni.redirectTo({
+          //   url: '/pages/pay/result?order_no=' + res.msg,
+          // })
         },
       })
     })
