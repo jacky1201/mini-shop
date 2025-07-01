@@ -51,6 +51,12 @@
       }
     },
     {
+      "path": "pages/club/videoList",
+      "style": {
+        "navigationBarTitleText": "视频列表"
+      }
+    },
+    {
       "path": "pages/order/confirm",
       "style": {
         "navigationBarTitleText": "订单确认"
