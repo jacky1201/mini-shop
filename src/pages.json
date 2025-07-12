@@ -104,7 +104,18 @@
         "navigationBarTitleText": "我的心愿单"
       }
     },
-    
+    {
+      "path": "pages/my/privacy-policy",
+      "style": {
+        "navigationBarTitleText": "隐私条款协议"
+      }
+    },
+    {
+      "path": "pages/my/user-agreement",
+      "style": {
+        "navigationBarTitleText": "用户服务协议"
+      }
+    },
     {
       "path": "pages/wevView/wevView",
       "style": {

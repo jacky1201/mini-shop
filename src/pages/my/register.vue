@@ -4,7 +4,7 @@
   import userApi from '@/api/user/user'
   import { success } from '@/utils/message'
 
-  const isAgree = ref(true)
+  const isAgree = ref(false)
   const userInfo = reactive({
     userName: '',
     avatar: '',
@@ -64,6 +64,12 @@
       userInfo.avatar = result.data.url
     })
   }
+
+  const gotoPath = (path: string) => {
+    uni.navigateTo({
+      url: path,
+    })
+  }
 </script>
 
 <template>
@@ -112,8 +118,10 @@
       <view class="privacy-agreement">
         <radio :checked="isAgree" @click="isAgree = !isAgree" color="#000" />
         <text class="agreement-text">
-          我已阅读并同意 CASETiFY 的
-          <text class="link">《隐私条款》</text>
+          我已阅读并同意
+          <text class="link" @click="gotoPath('./user-agreement')">《用户服务协议》</text>
+          和
+          <text class="link" @click="gotoPath('./privacy-policy')">《隐私条款协议》</text>
         </text>
       </view>
 

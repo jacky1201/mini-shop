@@ -7,7 +7,6 @@
 <script setup lang="ts">
   import homeApi from '@/api/home'
   import banner from '@/components/banner.vue'
-
   interface BannerItem {
     id: number
     pic_url: string
@@ -30,6 +29,8 @@
   onShow(() => {
     getBannerList()
   })
+
+  onMounted(() => {})
 </script>
 <style lang="scss" scoped>
   .content {

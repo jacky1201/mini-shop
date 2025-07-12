@@ -14,9 +14,20 @@
 
 <script lang="ts" setup>
   import clubApi from '@/api/club'
+  import { getQueryString } from '@/utils/util'
   onLoad((option) => {
     if (option && option.q) {
       console.log(option.q)
+      let code = getQueryString(option.q, 'code')
+      if (code) {
+        bindCode(code)
+      } else {
+        uni.showToast({
+          title: '二维码无效',
+          icon: 'none',
+          duration: 2000,
+        })
+      }
     }
     getGoodsList()
   })

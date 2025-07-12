@@ -30,8 +30,10 @@
     </view>
     <view class="button-box">
       <view class="lt">
-        <image class="cart-icon" :src="msgIcon" mode="aspectFit" @click="addToCart"></image>
-        <image class="msg-icon" :src="cartIcon" @click="gotoCart" mode="aspectFit"></image>
+        <button class="msg-btn" open-type="contact">
+          <image class="cart-icon" :src="msgIcon" mode="aspectFit"></image>
+        </button>
+        <image class="msg-icon" :src="cartIcon" @click="addToCart" mode="aspectFit"></image>
       </view>
       <view class="rt">
         <button class="add-to-cart" @click="addToCart">加入购物车</button>
@@ -161,6 +163,7 @@
   const selectedSpecs = ref(Array(specs.value.length).fill(null))
   const buyType = ref(1) // 1: buy now, 2: add to cart
   const buyNow = () => {
+    console.log(showSpecRef.value)
     showSpecRef.value.open()
     buyType.value = 1
   }
@@ -233,6 +236,12 @@
           favorite.value = true
         })
     }
+  }
+
+  const gotoChat = () => {
+    uni.navigateTo({
+      url: '/pages/chat/index?goods_id=' + goodsId.value,
+    })
   }
 </script>
 
@@ -526,5 +535,16 @@
       height: 80rpx;
       cursor: pointer;
     }
+  }
+
+  .msg-btn {
+    background: #fff;
+    padding: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  :deep(wx-button:after) {
+    border: 0px;
   }
 </style>
